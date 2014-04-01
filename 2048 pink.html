@@ -6,7 +6,7 @@
     <title>2048</title>
     <style type="text/css">
         body {
-            background-color: #EDEDED;
+            background-color: #FFF0F5;
         }
 
     </style>
@@ -60,11 +60,12 @@
         var activeAI = 0;
         var badBoardThreshold = 1.0; //256 - >132, roughly cuts in half
         var badBoardThresholdConstant = 20;
+        var scoreSupremum = 0;
 
         var debug = "";
         var debug2 = "Arrow keys to move";
         var debug3 = "G to start AI";
-        var debug4 = "H to stop AI";
+        var debug4 = "";
         var debug5 = "";
         var moves = 0;
         var pMoves = 0;
@@ -114,8 +115,11 @@
                 case 71: //G
                     activeAI = 1;
                     break;
-                case 72: //H
+                case 71: //h
                     activeAI = 0;
+                    break;
+                case 67: //D
+                    debug4 = getBestMove(board, 3);
                     break;
 
                 
@@ -142,6 +146,8 @@
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
                 tempBoard.push(board[i].slice());
+
+            scoreSupremum = score(board);
                 
         }
         function addRandomPiece() {
@@ -172,11 +178,11 @@
             }
         }
         function drawBoard() {
-            ctx.fillStyle = "#B7AFA3";
+            ctx.fillStyle = "#A57FA5";
             ctx.fillRect(0, 0, height * 4 + lineWidth, height * 4 + lineWidth);
         }
         function draw() {
-            ctx.clearRect(0, 0, 1000, 1000);
+            ctx.clearRect(0, 0, height * 4 + 250, height * 4);
             drawBoard();
             drawPieces();
             if (transition > 0 && transition < height)
@@ -207,6 +213,8 @@
                 move(bestMove);
             }
 
+            debug4 = "scoreSupremum: " + scoreSupremum;
+
             ctx.fillStyle = "#000000";
             ctx.font = "20px Calibri";
             ctx.fillText(debug, 600, 20);
@@ -217,17 +225,16 @@
 
             ctx.fillText("moves: " + moves, 600, 200);
             ctx.fillText("pMoves: " + pMoves, 600, 230);
-            ctx.fillText("score(board): " + score(board), 600, 260);
 
-
-            ctx.fillText("by John Ma", 600, 540);
+            debugScore = score(board);
+            ctx.fillText(debugScore, 600, 260);
 
         }
         function drawPieces() {
             for (var i = 0; i < 4; i++) 
                 for (var j = 0; j < 4; j++) {
                     //Draw background pieces
-                    ctx.fillStyle = "#E8D0A9";
+                    ctx.fillStyle = "#D8BFD8";
                     ctx.fillRect(i * height + lineWidth, j * height + lineWidth, height - lineWidth, height - lineWidth);
                 }
 
@@ -236,27 +243,27 @@
                     //Draw pieces
                     if (board[i][j] != 0) {
                         if (board[i][j] == 2)
-                            ctx.fillStyle = "#F5FAFA";
+                            ctx.fillStyle = "#EEE0E5";
                         else if (board[i][j] == 4)
-                            ctx.fillStyle = "#C1DAD6";
+                            ctx.fillStyle = "#FFB5C5";
                         else if (board[i][j] == 8)
-                            ctx.fillStyle = "#ACD1E9";
+                            ctx.fillStyle = "#CD6889";
                         else if (board[i][j] == 16)
-                            ctx.fillStyle = "#6D929B";
+                            ctx.fillStyle = "#CD919E";
                         else if (board[i][j] == 32)
-                            ctx.fillStyle = "#7F7A65";
+                            ctx.fillStyle = "#DB7093";
                         else if (board[i][j] == 64)
-                            ctx.fillStyle = "#FFB346";
+                            ctx.fillStyle = "#FF82AB";
                         else if (board[i][j] == 128)
-                            ctx.fillStyle = "#CC8F38";
+                            ctx.fillStyle = "#EE799F";
                         else if (board[i][j] == 256)
-                            ctx.fillStyle = "#7F5923";
+                            ctx.fillStyle = "#CD6889";
                         else if (board[i][j] == 1024)
-                            ctx.fillStyle = "#7F6949";
+                            ctx.fillStyle = "#8B475D";
                         else if (board[i][j] == 2048)
-                            ctx.fillStyle = "#FFB90B";
+                            ctx.fillStyle = "#FF3E96";
                         else
-                            ctx.fillStyle = "#7F672C";
+                            ctx.fillStyle = "#FF6EB4";
 
                         if (offsetX == 1)
                             ctx.fillRect(i * height + lineWidth + transition * boardOffset[i][j] - 0.5 * (boxHeight[i][j] - height),
@@ -282,11 +289,7 @@
                                 fontSize = 50;
 
                             if (board[i][j] == 2)
-                                ctx.fillStyle = "#191919";
-                            else if (board[i][j] == 4)
-                                ctx.fillStyle = "#363D3C";
-                            else if (board[i][j] == 8)
-                                ctx.fillStyle = "#313B42";
+                                ctx.fillStyle = "#2B0C1C";
                             else
                                 ctx.fillStyle = "#EEEEEE";
 
@@ -553,6 +556,8 @@
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
                 tempBoard.push(board[i].slice());
+            if (score(board) > scoreSupremum)
+                scoreSupremum = score(board);
         }
 
         //AI Functions
@@ -705,7 +710,7 @@
             var scores = [testBoardUpScore, testBoardDownScore, testBoardLeftScore, testBoardRightScore];
             scores.sort(function (a, b) { return b - a }); //biggest first
             
-            if (scores[0] < badBoardThreshold * score(board) - badBoardThresholdConstant) {
+            if (scores[0] < badBoardThreshold * scoreSupremum - badBoardThresholdConstant) {
                 pMoves++;
                 moves++;
 
@@ -799,7 +804,7 @@
 
             if (iterations == 1) {
 
-                if (score(generateMove(testBoard, direction)) < badBoardThreshold * score(board) - badBoardThresholdConstant)
+                if (score(generateMove(testBoard, direction)) < badBoardThreshold * scoreSupremum - badBoardThresholdConstant)
                     return 1.0;
                 else
                     return 0.0;
