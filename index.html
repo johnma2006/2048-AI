@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>2048</title>
+    <title>2048 AI</title>
     <style type="text/css">
         body {
             background-color: #EDEDED;
@@ -31,6 +31,7 @@
 
         var height = 141;
         var biggerHeight = 170;
+        var biggerHeightAI = 160;
         var boxHeight = Array();
         var fontSize = 80;
         var lineWidth = 16;
@@ -44,22 +45,13 @@
         var offsetX = 0;
         var offsetY = 0;
         var velocity = 14;
-        var movable = 0; function initialize() {
-
-            c = document.getElementById("canvas1");
-            ctx = c.getContext("2d");
-
-            initializeBoard();
-            drawBoard();
-
-            return setInterval(draw, 10);
-
-        }
+        var movable = 0;
         var heightVelocity = 1;
 
         var activeAI = 0;
         var badBoardThreshold = 1.0; //256 - >132, roughly cuts in half
-        var badBoardThresholdConstant = 20;
+        var badBoardThresholdConstant = 10;
+        var finishedAnimating = 1;
 
         var colour = "Default";
 
@@ -129,14 +121,24 @@
                 
             }
         }
-        
-        //Drawing functions
+        function initialize() {
+
+            c = document.getElementById("canvas1");
+            ctx = c.getContext("2d");
+
+            initializeBoard();
+            drawBoard();
+
+            return setInterval(draw, 10);
+
+        }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
                 //board = [[1024, 512, 256, 1024], [0, 0, 0, 32], [0, 0, 0, 0], [0, 0, 0, 0]];
                 //board = [[16, 8, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
+                //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
 
-               
+
                 //board = [[32, 8, 2, 2], [8, 2, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]]; //testing probabilities
                 //board = [[2, 0, 0, 0], [32, 4, 0, 0], [8, 8, 0, 0], [2, 2, 2, 2]]; //testing probabilities
 
@@ -147,12 +149,14 @@
             }
             addRandomPiece();
             addRandomPiece();
-            
+
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
                 tempBoard.push(board[i].slice());
-                
+
         }
+
+        //Drawing functions
         function drawBoard() {
             if (colour == "Default") {
                 ctx.fillStyle = "#B7AFA3";
@@ -171,16 +175,18 @@
         function draw() {
             ctx.clearRect(0, 0, 1000, 1000);
             drawBoard();
-            drawPieces();
             if (transition > 0 && transition < height)
                 transition += velocity;
-            
             else if (transition >= height) {
                 transition = -1;
                 for (var i = 0; i < 4; i++)
                     for (var j = 0; j < 4; j++)
-                        if (boxHeight[i][j] == height + 1)
-                            boxHeight[i][j] = biggerHeight;
+                        if (boxHeight[i][j] == height + 1) {
+                            if (activeAI == 0)
+                                boxHeight[i][j] = biggerHeight;
+                            if (activeAI == 1)
+                                boxHeight[i][j] = biggerHeightAI;
+                        }
                 updateBoard();
             }
 
@@ -195,9 +201,27 @@
                     }
                 }
 
+            drawPieces();
+
+            if (finishedAnimating == 1)
+                finishedAnimating = 2;
+            else if (finishedAnimating == 2)
+                finishedAnimating = 3;
+            else if (finishedAnimating == 3)
+                finishedAnimating = 4;
+            
+            /*
+            finishedAnimating = 1;
+            for (var i = 0; i < 4; i++)
+                for (var j = 0; j < 4; j++)
+                    if (boxHeight[i][j] > height)
+                        finishedAnimating = 0;
+*/
             if (activeAI == 1 && transition == -1) {
-                var bestMove = getBestMove(board, 3);
-                move(bestMove);
+                if (finishedAnimating == 4) {
+                    finishedAnimating = 0;
+                    move(getBestMove(board, 3));
+                }
             }
 
             ctx.fillStyle = "#000000";
@@ -219,7 +243,7 @@
             ctx.fillText("pMoves: " + pMoves, 610, 510);
             ctx.fillText("score(board): " + score(board), 610, 530);
             ctx.fillText("colour: " + colour, 610, 550);
-            ctx.fillText(debug, 610, 320);
+            ctx.fillText(debug, 610, 570);
 
         }
         function drawPieces() {
@@ -657,6 +681,8 @@
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
                 tempBoard.push(board[i].slice());
+
+            finishedAnimating = 1;
         }
 
         //AI functions
@@ -877,8 +903,8 @@
 
                     for (var i = 0; i < arrayOfNewTestBoards.length; i++) {
 
-                        var maxNumber = Math.max(getMaxMinScore(arrayOfNewTestBoards[i], "up", iterations - 1), //this is sometimes infinity
-                                                getMaxMinScore(arrayOfNewTestBoards[i], "down", iterations - 1), //if it is infinity, that means
+                        var maxNumber = Math.max(getMaxMinScore(arrayOfNewTestBoards[i], "up", iterations - 1),
+                                                getMaxMinScore(arrayOfNewTestBoards[i], "down", iterations - 1),
                                                 getMaxMinScore(arrayOfNewTestBoards[i], "left", iterations - 1),
                                                 getMaxMinScore(arrayOfNewTestBoards[i], "right", iterations - 1));
 
@@ -952,14 +978,39 @@
 
             var score = 0;
 
-            //Weight numbers. Add [0, 
+            //Weighted sum of board. Columns 1 and 2 are snake.
             for (var j = 0; j < 4; j++) {
-                score += testBoard[0][j] * Math.pow(3, -10 + 13 - j); //11 10 9 8 
-                score += testBoard[1][j] * Math.pow(3, -10 + j + 3);  //3 4 5 6
-                score += testBoard[2][j] * Math.pow(3, -10 + j - 2);  //1 2 3 4 
-                score += testBoard[3][j] * Math.pow(3, -10 + j - 7);      //0 1 2 3
+                score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
+                score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
             }
 
+            //If it messed up
+            if (board[0][0] < board[0][1] && board[0][1] <= 256 && board[0][0] > board[1][0]) {
+                score = 0;
+                score += testBoard[0][0] * Math.pow(3, -17 + 20 - 0); //20
+                score += testBoard[0][1] * Math.pow(3, -17 + 20 - 1); //20
+                for (var j = 0; j < 4; j++) {
+                    //score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
+                    score += testBoard[1][j] * Math.pow(3, -17 + (3 - j) + 10); //13 12 11 10
+                }
+            }
+
+            //Columns 3 and 4 are dependent on largest number in column 2.
+            var column2 = board[1].slice();
+            var maxNum = column2.sort(function (a, b) { return b - a })[0]; //biggest first
+
+            if (maxNum == column2[2] || maxNum == column2[3]) {
+                for (var j = 0; j < 4; j++) {
+                    score += testBoard[2][j] * Math.pow(3, -17 + j + 5); //5 6 7 8 
+                    score += testBoard[3][j] * Math.pow(3, -17 + j);     //0 1 2 3
+                }
+            }
+            else {
+                for (var j = 0; j < 4; j++) {
+                    score += testBoard[2][j] * Math.pow(3, -17 + (3 - j) + 5); //8 7 6 5 
+                    score += testBoard[3][j] * Math.pow(3, -17 + (3 - j));     //3 2 1 0
+                }
+            }
 
             /*
             //Weight numbers
