@@ -129,7 +129,7 @@
         }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
-                //board = [[1024, 512, 256, 64], [2, 0, 4, 16], [0, 2, 4, 2], [0, 0, 0, 0]];
+                board = [[1024, 512, 256, 64], [2, 0, 4, 16], [0, 2, 4, 2], [0, 0, 0, 0]];
                 //board = [[16, 8, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
                 //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
 
@@ -137,13 +137,13 @@
                 //board = [[32, 8, 2, 2], [8, 2, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]]; //testing probabilities
                 //board = [[2, 0, 0, 0], [32, 4, 0, 0], [8, 8, 0, 0], [2, 2, 2, 2]]; //testing probabilities
 
-                board[i] = [0, 0, 0, 0];
+                //board[i] = [0, 0, 0, 0];
                 boardOffset[i] = [0, 0, 0, 0];
                 boardOffset2[i] = [0, 0, 0, 0];
                 boxHeight[i] = [height, height, height, height];
             }
-            addRandomPiece();
-            addRandomPiece();
+            //addRandomPiece();
+            //addRandomPiece();
 
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
@@ -996,9 +996,9 @@
             var column2 = board[1].slice();
             var maxNum = column2.sort(function (a, b) { return b - a })[0]; //biggest first
 
-            if (maxNum == column2[2] || maxNum == column2[3]) {
+            if (maxNum == column2[2] || maxNum == column2[0]) {
                 for (var j = 0; j < 4; j++) {
-                    score += testBoard[2][j] * Math.pow(3, -17 + j + 5); //5 6 7 8    push numbers down 
+                    score += testBoard[2][j] * Math.pow(3, -17 + j + 5); //5 6 7 8 
                     score += testBoard[3][j] * Math.pow(3, -17 + j);     //0 1 2 3
                 }
             }
