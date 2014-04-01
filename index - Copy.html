@@ -978,9 +978,11 @@
                 score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
                 score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
             }
+            if (board[0][3] < board[1][3])
+                score -= 1.5 * testBoard[1][3] * Math.pow(3, -17 + 3 + 10); //10 11 12 13
 
             //If it messed up
-            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 256 && testBoard[0][0] > testBoard[1][0]) {
+            if (board[0][0] < board[0][1] && board[0][1] <= 256 && board[0][0] > board[1][0]) {
                 score = 0;
                 score += testBoard[0][0] * Math.pow(3, -17 + 20 - 0); //20
                 score += testBoard[0][1] * Math.pow(3, -17 + 20 - 1); //20
@@ -991,7 +993,7 @@
             }
 
             //Columns 3 and 4 are dependent on largest number in column 2.
-            var column2 = [testBoard[1][0], testBoard[1][1], testBoard[1][2], testBoard[1][3]];
+            var column2 = board[1].slice();
             var maxNum = column2.sort(function (a, b) { return b - a })[0]; //biggest first
 
             if (maxNum == column2[2] || maxNum == column2[3]) {
@@ -1008,18 +1010,16 @@
             }
 
             //Penalize for covering smaller tiles in 1st column with larger tiles in 2nd column
-            for (var i = 0; i < 4; i++)
-                if (testBoard[0][i] < testBoard[1][i])
-                    score -= 10;
-
-
+            //for (var i = 0; i < 4; i++)
+              //  if (4 * board[0][i] < board[1][i])
+                //   score -= 100;
 
             /*
             //Weight numbers
             for (var j = 0; j < 4; j++) {
                 score += testBoard[0][j] * Math.pow(2, -10 + 11 - j); //11 10 9 8 
 
-                if (board[0][0] >= testBoard[0][1]) {
+                if (board[0][0] >= board[0][1]) {
 
                     score += testBoard[1][j] * Math.pow(2, -10 + j + 3); //3 4 5 6
                     score += testBoard[2][j] * Math.pow(2, -10 + j + 0); //0 1 2 3
