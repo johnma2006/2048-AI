@@ -14,7 +14,7 @@
 </head>
 <body>
     
-    <canvas id="canvas1" width="920" height="580" style="border:0px solid #c3c3c3; margin-left:27%;margin-top:40px"></canvas>
+    <canvas id="canvas1" width="920" height="580" style="border:0px solid #c3c3c3; margin-left:27%;margin-top:40px" oncontextmenu="return false;"></canvas>
     
     <script>
 
@@ -52,6 +52,7 @@
         var badBoardThreshold = 1.0; //256 - >132, roughly cuts in half
         var badBoardThresholdConstant = 0.02;
         var finishedAnimating = 1;
+        var controllingAddedTiles = 0;
 
         var colour = "Default";
 
@@ -63,18 +64,22 @@
         function doKeyDown(evt) {
             switch (evt.keyCode) {
                 case 38: //Up
+                    controllingAddedTiles = 0;
                     updateBoard();
                     move("up");
                     break;
                 case 40: //Down
+                    controllingAddedTiles = 0;
                     updateBoard();
                     move("down");
                     break;
                 case 37: //Left
+                    controllingAddedTiles = 0;
                     updateBoard();
                     move("left");
                     break;
                 case 39: //Right
+                    controllingAddedTiles = 0;
                     updateBoard();
                     move("right");
                     break;
@@ -93,13 +98,16 @@
                     break;
 
                 case 70: //F
+                    controllingAddedTiles = 0;
                     bestMove = getBestMove(board, 3);
                     move(bestMove);
                     break;
                 case 71: //G
+                    controllingAddedTiles = 0;
                     activeAI = 1;
                     break;
                 case 72: //H
+                    controllingAddedTiles = 0;
                     activeAI = 0;
                     break;
 
@@ -129,7 +137,7 @@
         }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
-                //board = [[1024, 512, 256, 2], [2, 2, 0, 64], [0, 2, 4, 2], [0, 0, 0, 0]];
+                board = [[1024, 512, 256, 2], [2, 2, 0, 0], [0, 2, 4, 2], [0, 0, 0, 0]];
                 //board = [[1024, 512, 2, 32], [64, 64, 128, 4], [0, 2, 4, 0], [0, 0, 0, 0]];
                 //board = [[16, 8, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
                 //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
@@ -138,13 +146,13 @@
                 //board = [[32, 8, 2, 2], [8, 2, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]]; //testing probabilities
                 //board = [[2, 0, 0, 0], [32, 4, 0, 0], [8, 8, 0, 0], [2, 2, 2, 2]]; //testing probabilities
 
-                board[i] = [0, 0, 0, 0];
+                //board[i] = [0, 0, 0, 0];
                 boardOffset[i] = [0, 0, 0, 0];
                 boardOffset2[i] = [0, 0, 0, 0];
                 boxHeight[i] = [height, height, height, height];
             }
-            addRandomPiece();
-            addRandomPiece();
+            //addRandomPiece();
+            //addRandomPiece();
 
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
@@ -205,18 +213,15 @@
                 finishedAnimating = 3;
             else if (finishedAnimating == 3)
                 finishedAnimating = 4;
-            
-            /*
-            finishedAnimating = 1;
-            for (var i = 0; i < 4; i++)
-                for (var j = 0; j < 4; j++)
-                    if (boxHeight[i][j] > height)
-                        finishedAnimating = 0;
-*/
+
             if (activeAI == 1 && transition == -1) {
                 if (finishedAnimating == 4) {
                     finishedAnimating = 0;
-                    move(getBestMove(board, 3));
+                    var bestMove = getBestMove(board, 3);
+                    //if (board[1][3] > 8 && generateMove(board, bestMove)[1][3] == 0 && bestMove == "up")
+                      //  activeAI = 0;
+                    //else
+                    move(bestMove);
                 }
             }
 
@@ -231,7 +236,11 @@
             ctx.font = "bold 20px Calibri";
             ctx.fillText("Arrow keys to move", 610, 140);
             ctx.fillText("G/H to start/stop AI", 610, 170);
-            ctx.fillText("1/2 to change theme", 610, 200);
+            ctx.fillText("Left/right click a tile to place 2/4", 610, 200);
+            ctx.font = "14px Calibri";
+            ctx.fillText("(Try to make the computer lose)", 610, 220);
+            ctx.font = "bold 20px Calibri";
+            ctx.fillText("1/2 to change theme", 610, 250);
 
             ctx.font = "14px Calibri"; 
 
@@ -321,12 +330,16 @@
                     return "#CC8F38";
                 else if (board[i][j] == 256)
                     return "#7F5923";
+                else if (board[i][j] == 512)
+                    return "#5E5241";
                 else if (board[i][j] == 1024)
                     return "#7F6949";
                 else if (board[i][j] == 2048)
-                    return "#FFB90B";
+                    return "#678470";
+                else if (board[i][j] == 4096)
+                    return "#65A4C7";
                 else
-                    return "#7F672C";
+                    return "#6581C7";
             }
             else if (colour == "Blue") {
                 if (i == -1)
@@ -373,10 +386,14 @@
                     return "#EE799F";
                 else if (board[i][j] == 256)
                     return "#CD6889";
+                else if (board[i][j] == 512)
+                    return "#CC869D";
                 else if (board[i][j] == 1024)
                     return "#8B475D";
                 else if (board[i][j] == 2048)
                     return "#FF3E96";
+                else if (board[i][j] == 4096)
+                    return "#FF4FBB";
                 else
                     return "#FF6EB4";
             }
@@ -671,7 +688,8 @@
             }
 
             if (movable == 1) {
-                addRandomPiece();
+                if (controllingAddedTiles == 0 || activeAI == 1)
+                    addRandomPiece();
                 movable = 0;
             }
 
@@ -680,6 +698,22 @@
                 tempBoard.push(board[i].slice());
 
             finishedAnimating = 1;
+        }
+        function addClickElementToBoard(ev) {
+            var x = ev.clientX - c.offsetLeft;
+            var y = ev.clientY - c.offsetTop;
+
+            x = Math.floor(x / height);
+            y = Math.floor(y / height);
+
+            if (board[x][y] == 0) {
+                controllingAddedTiles = 1;
+                if (ev.which == 1)
+                    board = generateAddElement(board, x, y, 2);
+                else if (ev.which == 3)
+                    board = generateAddElement(board, x, y, 4);
+                move(getBestMove(board, 3));
+            }
         }
 
         //AI functions
@@ -1009,10 +1043,8 @@
 
             //Penalize for covering smaller tiles in 1st column with larger tiles in 2nd column
             for (var i = 0; i < 4; i++)
-                if (testBoard[0][i] < testBoard[1][i])
+                if (2 * testBoard[0][i] < testBoard[1][i])
                     score -= 10;
-
-
 
             /*
             //Weight numbers
@@ -1067,10 +1099,11 @@
             }
         }
 
+
         initialize();
         window.addEventListener('keydown', doKeyDown, true);
-        
-
+        window.addEventListener('click', addClickElementToBoard, true);
+        window.addEventListener('contextmenu', addClickElementToBoard, false);
 
     </script>
 
