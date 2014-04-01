@@ -137,7 +137,7 @@
         }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
-                board = [[1024, 512, 256, 2], [2, 2, 0, 0], [0, 2, 4, 2], [0, 0, 0, 0]];
+                //board = [[1024, 512, 256, 2], [2, 2, 0, 0], [0, 2, 4, 2], [0, 0, 0, 0]];
                 //board = [[1024, 512, 2, 32], [64, 64, 128, 4], [0, 2, 4, 0], [0, 0, 0, 0]];
                 //board = [[16, 8, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
                 //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
@@ -146,13 +146,13 @@
                 //board = [[32, 8, 2, 2], [8, 2, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]]; //testing probabilities
                 //board = [[2, 0, 0, 0], [32, 4, 0, 0], [8, 8, 0, 0], [2, 2, 2, 2]]; //testing probabilities
 
-                //board[i] = [0, 0, 0, 0];
+                board[i] = [0, 0, 0, 0];
                 boardOffset[i] = [0, 0, 0, 0];
                 boardOffset2[i] = [0, 0, 0, 0];
                 boxHeight[i] = [height, height, height, height];
             }
-            //addRandomPiece();
-            //addRandomPiece();
+            addRandomPiece();
+            addRandomPiece();
 
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
@@ -1011,6 +1011,10 @@
             for (var j = 0; j < 4; j++) {
                 score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
                 score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
+            }
+
+            if (board[1][2] <= board[0][2] / 4) {//Prevent buildup of (1, 2) tiles
+
             }
 
             //If it messed up
