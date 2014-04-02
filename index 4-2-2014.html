@@ -50,21 +50,18 @@
 
         var activeAI = 0;
         var badBoardThreshold = 1.0; //256 - >132, roughly cuts in half
-        var badBoardThresholdConstant = 0.02; // 0.02
+        var badBoardThresholdConstant = 0.02;
         var finishedAnimating = 1;
         var controllingAddedTiles = 0;
 
         var colour = "Default";
 
         var probabilityOfLosing = 0;
-        var probabilityOfHavingLost = 0;
-        var secondColOff = 0;
 
         var debug = "";
         var debug2 = "";
         var moves = 0;
         var pMoves = 0;
-        var deepMoves = 0;
 
         function doKeyDown(evt) {
             switch (evt.keyCode) {
@@ -143,18 +140,17 @@
         }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
-                //board = [[2048, 1024, 256, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
-                //board = [[1024, 512, 2, 32], [2, 2, 128, 4], [0, 2, 4, 0], [0, 0, 0, 0]];
-                //board = [[1024, 512, 128, 64], [64, 128, 256, 8], [16, 32, 0, 0], [2, 8, 4, 0]];
+                //board = [[2048, 1024, 512, 128], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+                board = [[1024, 512, 2, 32], [64, 64, 128, 4], [0, 2, 4, 0], [0, 0, 0, 0]];
                 //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
 
-                board[i] = [0, 0, 0, 0];
+                //board[i] = [0, 0, 0, 0];
                 boardOffset[i] = [0, 0, 0, 0];
                 boardOffset2[i] = [0, 0, 0, 0];
                 boxHeight[i] = [height, height, height, height];
             }
-            addRandomPiece();
-            addRandomPiece();
+            //addRandomPiece();
+            //addRandomPiece();
 
             tempBoard = Array();
             for (var i = 0; i < 4; i++)
@@ -237,13 +233,7 @@
                     //if (board[2][3] > 4 && generateMove(board, bestMove)[2][3] == 0 && bestMove == "up")
                        // activeAI = 0;
                     //else
-                    if (probabilityOfLosing < 0.05)
-                        move(getBestMove(board, 3));
-                    else {
-                        move(getBestMove(board, 4));
-                        deepMoves++;
-                    }
-
+                    move(getBestMove(board, 3));
                 }
             }
 
@@ -266,11 +256,10 @@
             ctx.font = "14px Calibri"; 
 
             ctx.fillText("moves: " + moves, 610, 470);
-            ctx.fillText("(pMoves, deepMoves): (" + pMoves + ", " + deepMoves + ")", 610, 490);
+            ctx.fillText("pMoves: " + pMoves, 610, 490);
             ctx.fillText("score(board): " + score(board), 610, 510);
-            ctx.fillText("p(Lost): " + Math.floor(probabilityOfHavingLost * 10000) / 100 + "%", 610, 530);
-            ctx.fillText("secondColOff: " + secondColOff, 610, 550);
-
+            ctx.fillText("colour: " + colour, 610, 530);
+            ctx.fillText("probabilityOfLosing: " + Math.floor(probabilityOfLosing * 10000) / 100 + "%", 610, 550);
             ctx.fillText(debug, 610, 570);
             ctx.fillText(debug2, 610, 590);
 
@@ -900,10 +889,8 @@
 
                 var probabilities = [testBoardUpProbability, testBoardDownProbability, testBoardLeftProbability, testBoardRightProbability];
                 probabilities.sort(function (a, b) { return b - a }); //biggest first
-                if (scores[0] == -10) {
-                    probabilityOfLosing = probabilities[3];
-                    probabilityOfHavingLost = 1 - (1 - probabilityOfHavingLost) * (1 - probabilities[3]);
-                }
+                if (scores[0] == -10)
+                    probabilityOfLosing = 1 - (1 - probabilityOfLosing) * (1 - probabilities[3]);
                     //alert(probabilities[3]);
 
                 for (var i = 3; i >= 0; i--) {
@@ -919,7 +906,6 @@
                 }
             }
             else {
-                probabilityOfLosing = 0;
                 moves++;
                 for (var i = 0; i < 4; i++) {
 
@@ -1042,7 +1028,7 @@
                 if (!(testBoard[1][3] < testBoard[1][2] && testBoard[0][2] >= 256 &&
                     (testBoard[1][2] <= 64 && testBoard[1][3] <= 32))) {
                     score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
-                    secondColOff = 0;
+                    debug = "good";
                 }
             }
             
@@ -1052,7 +1038,7 @@
                 //score += testBoard[1][2] * Math.pow(3, -17 + 2 + 10); //12
                 score += testBoard[1][3] * Math.pow(3, -17 + 3 + 10); //13
                 score -= testBoard[1][2] / testBoard[1][3];
-                secondColOff = 1;
+                debug = "bad";
             }
 
             //If it messed up 1st column
@@ -1070,7 +1056,7 @@
             var column2 = [testBoard[1][0], testBoard[1][1], testBoard[1][2], testBoard[1][3]];
             var maxNum = column2.sort(function (a, b) { return b - a })[0]; //biggest first
 
-            if (maxNum == column2[0] || maxNum == column2[1]) { //backwards logic for some reason
+            if (maxNum == column2[2] || maxNum == column2[3]) {
                 for (var j = 0; j < 4; j++) {
                     score += testBoard[2][j] * Math.pow(3, -17 + j + 5); //5 6 7 8    push numbers down 
                     score += testBoard[3][j] * Math.pow(3, -17 + j);     //0 1 2 3
