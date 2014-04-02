@@ -1038,7 +1038,8 @@
 
             //Weighted sum of board. Columns 1 and 2 are snake.
             for (var j = 0; j < 4; j++) {
-                score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
+                if (j != 3)
+                    score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
                 if (!(testBoard[1][3] < testBoard[1][2] && testBoard[0][2] >= 256 &&
                     (testBoard[1][2] <= 64 && testBoard[1][3] <= 32))) {
                     score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
@@ -1048,7 +1049,8 @@
             
             //If it messed up 2nd column
             if (testBoard[1][3] < testBoard[1][2] && testBoard[0][2] >= 256 &&
-                (testBoard[1][2] <= 64 && testBoard[1][3] <= 32)) {
+                (testBoard[1][2] <= 64 && testBoard[1][3] <= 32)
+                && testBoard[2][3] < testBoard[1][3]) {
                 //score += testBoard[1][2] * Math.pow(3, -17 + 2 + 10); //12
                 score += testBoard[1][3] * Math.pow(3, -17 + 3 + 10); //13
                 score -= testBoard[1][2] / testBoard[1][3];
@@ -1070,7 +1072,7 @@
             var column2 = [testBoard[1][0], testBoard[1][1], testBoard[1][2], testBoard[1][3]];
             var maxNum = column2.sort(function (a, b) { return b - a })[0]; //biggest first
 
-            if (maxNum == column2[0] || maxNum == column2[1]) { //backwards logic for some reason
+            if (maxNum == column2[2] || maxNum == column2[3]) { //backwards logic for some reason
                 for (var j = 0; j < 4; j++) {
                     score += testBoard[2][j] * Math.pow(3, -17 + j + 5); //5 6 7 8    push numbers down 
                     score += testBoard[3][j] * Math.pow(3, -17 + j);     //0 1 2 3
@@ -1084,7 +1086,7 @@
             }
 
             //Penalize for covering smaller tiles in 1st column with larger tiles in 2nd column
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 3; i++)
                 if (2 * testBoard[0][i] < testBoard[1][i])
                     score -= 10;
 
