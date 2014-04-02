@@ -50,7 +50,7 @@
 
         var activeAI = 0;
         var badBoardThreshold = 1.0; //256 - >132, roughly cuts in half
-        var badBoardThresholdConstant = 0.0002;
+        var badBoardThresholdConstant = 0.02;
         var finishedAnimating = 1;
         var controllingAddedTiles = 0;
 
@@ -99,7 +99,7 @@
 
                 case 70: //F
                     controllingAddedTiles = 0;
-                    bestMove = getBestMove(board, 3);
+                    bestMove = getBestMove(board, 4);
                     move(bestMove);
                     break;
                 case 71: //G
