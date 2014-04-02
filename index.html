@@ -105,6 +105,7 @@
                 case 71: //G
                     controllingAddedTiles = 0;
                     activeAI = 1;
+
                     break;
                 case 72: //H
                     controllingAddedTiles = 0;
@@ -137,7 +138,7 @@
         }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
-                //board = [[1024, 512, 256, 2], [2, 2, 0, 0], [0, 2, 4, 2], [0, 0, 0, 0]];
+                //board = [[2048, 1024, 512, 256], [2, 2, 32, 2], [0, 2, 4, 2], [0, 0, 0, 0]];
                 //board = [[1024, 512, 2, 32], [64, 64, 128, 4], [0, 2, 4, 0], [0, 0, 0, 0]];
                 //board = [[16, 8, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
                 //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
@@ -200,35 +201,48 @@
                         boxHeight[i][j] = 0.75 * boxHeight[i][j] + 0.25 * height;
                     else if (boxHeight[i][j] > height && boxHeight[i][j] != height + 1) {
                         boxHeight[i][j] = 0.85 * boxHeight[i][j] + 0.15 * height;
-                        if (boxHeight[i][j] > height + 1 && boxHeight[i][j] < height + 4)
+                        if (boxHeight[i][j] > height + 1 && boxHeight[i][j] < height + 2 && (boxHeight < height && boxHeight > height - 5))
                             boxHeight[i][j] = height;
                     }
                 }
 
             drawPieces();
 
-            if (finishedAnimating == 1)
-                finishedAnimating = 2;
-            else if (finishedAnimating == 2)
-                finishedAnimating = 3;
-            else if (finishedAnimating == 3)
-                finishedAnimating = 4;
+            if (finishedAnimating == 0) {
+                finishedAnimating = 1;
+                for (var i = 0; i < 4; i++)
+                    for (var j = 0; j < 4; j++)
+                        if (boxHeight[i][j] != height)
+                            finishedAnimating = 0;
+            }
+
+            if (finishedAnimating > 0)
+                finishedAnimating++;
+
+            /*debug = finishedAnimating;
+            
+            var emptySpaces = 0;
+            for (var i = 0; i < 4; i++)
+                for (var j = 0; j < 4; j++)
+                    if (board[i][j] == 0)
+                        emptySpaces++;
+
+            var changeInAnimationTime = (emptySpaces - 14) * (emptySpaces - 16) / 5*/
 
             if (activeAI == 1 && transition == -1) {
-                if (finishedAnimating == 4) {
+                if (finishedAnimating > 3) {
                     finishedAnimating = 0;
-                    var bestMove = getBestMove(board, 3);
+                    //var bestMove = getBestMove(board, 3);
                     //if (board[1][3] > 8 && generateMove(board, bestMove)[1][3] == 0 && bestMove == "up")
                       //  activeAI = 0;
                     //else
-                    move(bestMove);
+                    move(getBestMove(board, 3));
                 }
             }
 
             ctx.fillStyle = "#000000";
             ctx.font = "bold 40px Calibri";
             ctx.fillText("2048 AI", 610, 40);
-
 
             ctx.font = "20px Calibri";
             ctx.fillText("by John Ma", 610, 70);
@@ -1010,18 +1024,24 @@
             //Weighted sum of board. Columns 1 and 2 are snake.
             for (var j = 0; j < 4; j++) {
                 score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
-                score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
+                if (!(testBoard[1][3] < testBoard[1][2] && testBoard[0][2] > testBoard[1][2] && testBoard[0][3] > testBoard[1][2] &&
+                    (testBoard[1][2] <= 64 || testBoard[1][2] / testBoard[1][3] <= 4)))
+                    score += testBoard[1][j] * Math.pow(3, -17 + j + 10); //10 11 12 13
+            }
+            
+            //If it messed up 2nd column
+            if (testBoard[1][3] < testBoard[1][2] && testBoard[0][2] > testBoard[1][2] && testBoard[0][3] > testBoard[1][2] &&
+                (testBoard[1][2] <= 64 || testBoard[1][2] / testBoard[1][3] <= 4)) {
+                //score += testBoard[1][2] * Math.pow(3, -17 + 2 + 10); //12
+                score += testBoard[1][3] * Math.pow(3, -17 + 3 + 10); //13
+                score -= testBoard[1][2] / testBoard[1][3];
             }
 
-            if (board[1][2] <= board[0][2] / 4) {//Prevent buildup of (1, 2) tiles
-
-            }
-
-            //If it messed up
-            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 256 && testBoard[0][0] > testBoard[1][0]) {
+            //If it messed up 1st column
+            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 256) {
                 score = 0;
                 score += testBoard[0][0] * Math.pow(3, -17 + 20 - 0); //20
-                score += testBoard[0][1] * Math.pow(3, -17 + 20 - 1); //20
+                score += testBoard[0][1] * Math.pow(3, -17 + 20 - 1); //19
                 for (var j = 0; j < 4; j++) {
                     //score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
                     score += testBoard[1][j] * Math.pow(3, -17 + (3 - j) + 10); //13 12 11 10
