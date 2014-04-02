@@ -1058,7 +1058,7 @@
             }
 
             //If it messed up 1st column
-            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 256) {
+            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 256 && testBoard[1][0] <= 256) {
                 score = 0;
                 score += testBoard[0][0] * Math.pow(3, -17 + 20 - 0); //20
                 score += testBoard[0][1] * Math.pow(3, -17 + 20 - 1); //19
