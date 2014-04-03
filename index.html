@@ -1038,7 +1038,7 @@
 
             //Weighted sum of board. Columns 1 and 2 are snake.
             for (var j = 0; j < 4; j++) {
-                if (!(j == 3 && board[0][2] == 512))
+                if (!(j == 3 && board[0][2] >= 256))
                     score += testBoard[0][j] * Math.pow(3, -17 + 20 - j); //20 19 18 17 
                 if (!(testBoard[1][3] < testBoard[1][2] && testBoard[0][2] >= 256 &&
                     (testBoard[1][2] <= 64 && testBoard[1][3] <= 32))) {
@@ -1088,49 +1088,8 @@
             //Penalize for covering smaller tiles in 1st column with larger tiles in 2nd column
             for (var i = 0; i < 3; i++)
                 if (2 * testBoard[0][i] < testBoard[1][i])
-                    if (!(j == 3 && board[0][2] == 512))
+                    if (!(j == 3 && board[0][2] >= 256))
                         score -= 10;
-
-            /*
-            //Weight numbers
-            for (var j = 0; j < 4; j++) {
-                score += testBoard[0][j] * Math.pow(2, -10 + 11 - j); //11 10 9 8 
-
-                if (board[0][0] >= testBoard[0][1]) {
-
-                    score += testBoard[1][j] * Math.pow(2, -10 + j + 3); //3 4 5 6
-                    score += testBoard[2][j] * Math.pow(2, -10 + j + 0); //0 1 2 3
-                    score += testBoard[3][j] * Math.pow(2, -10 + j - 2); //-2 -1 0 1
-                }
-                else {
-
-                    score += testBoard[1][j] * Math.pow(2, -10 + (4 - j) + 3); //3 4 5 6
-                    score += testBoard[2][j] * Math.pow(2, -10 + (4 - j) + 0); //0 1 2 3
-                    score += testBoard[3][j] * Math.pow(2, -10 + (4 - j) - 2); //-2 -1 0 1
-
-                }
-            }
-
-            //2nd column should be in increasing order
-            var subscore = 0;
-            if (testBoard[1][2] > testBoard[1][3])
-                score -= testBoard[1][2] - testBoard[1][3];
-
-            //1st column should be larger than 2nd
-            for (var i = 2; i < 4; i++) {
-                if (testBoard[0][i] < testBoard[1][i])
-                    score -= Math.pow(32 / testBoard[0][i], 2);
-            }
-
-            //More empty squares
-            var emptySquares = 0;
-            for (var i = 0; i < 4; i++)
-                for (var j = 0; j < 4; j++)
-                    if (testBoard[i][j] == 0)
-                        emptySquares++;
-
-            if (emptySquares < 5)
-                score -= 1000 * (5 - emptySquares);*/
 
             if (testBoard == "False")
                 return -10;
