@@ -18,10 +18,6 @@
     
     <script>
 
-        /* Todo: 
-            -badBoardThresholdConstant proportional to derivative of score
-        */
-
         var c;
         var ctx;
 
@@ -1058,7 +1054,7 @@
             }
 
             //If it messed up 1st column
-            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 256 && testBoard[1][0] <= 256) {
+            if (testBoard[0][0] < testBoard[0][1] && testBoard[0][1] <= 512 && testBoard[1][0] < testBoard[0][0]) {
                 score = 0;
                 score += testBoard[0][0] * Math.pow(3, -17 + 20 - 0); //20
                 score += testBoard[0][1] * Math.pow(3, -17 + 20 - 1); //19
@@ -1067,6 +1063,7 @@
                     score += testBoard[1][j] * Math.pow(3, -17 + (3 - j) + 10); //13 12 11 10
                 }
             }
+
 
             //Columns 3 and 4 are dependent on largest number in column 2.
             var column2 = [testBoard[1][0], testBoard[1][1], testBoard[1][2], testBoard[1][3]];
