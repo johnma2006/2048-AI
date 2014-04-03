@@ -143,7 +143,7 @@
         }
         function initializeBoard() {
             for (var i = 0; i < 4; i++) {
-                //board = [[2048, 1024, 256, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+                //board = [[2048, 1024, 128, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
                 //board = [[1024, 512, 2, 32], [2, 2, 128, 4], [0, 2, 4, 0], [0, 0, 0, 0]];
                 //board = [[1024, 512, 128, 64], [64, 128, 256, 8], [16, 32, 0, 0], [2, 8, 4, 0]];
                 //board = [[2, 256, 0, 2], [4, 4, 0, 0], [2, 0, 0, 0], [0, 0, 0, 0]];
@@ -1048,7 +1048,7 @@
             }
             
             //If it messed up 2nd column
-            if (testBoard[1][3] < testBoard[1][2] && testBoard[0][2] >= 256 &&
+            if (testBoard[1][3] < testBoard[1][2] && testBoard[0][2] >= 256 && testBoard[0][0] >= 2048 &&
                 (testBoard[1][2] <= 64 && testBoard[1][3] <= 32)
                 && testBoard[2][3] < testBoard[1][3]) {
                 //score += testBoard[1][2] * Math.pow(3, -17 + 2 + 10); //12
