@@ -14,7 +14,7 @@
 </head>
 <body>
     
-    <canvas id="canvas1" width="920" height="600" style="border:0px solid #c3c3c3; margin-left:27%;margin-top:40px" oncontextmenu="return false;"></canvas>
+    <canvas id="canvas1" width="920" height="580" style="border:0px solid #c3c3c3; margin-left:27%;margin-top:40px" oncontextmenu="return false;"></canvas>
     
     <script>
 
@@ -86,37 +86,21 @@
                     break;
                     
                 case 87: //W
-                    var newBoard = generateMove(board, "up");
-                    for (var i = 0; i < 4; i++)
-                        board[i] = newBoard[i].slice();
-                    addRandomPiece();
-                    //debug = "U: (" + getMaxMinScore(board, "up", 3) + ", " + getMaxMinScoreProbability(board, "up", 3) + ")";
+                    debug = "U: (" + getMaxMinScore(board, "up", 3) + ", " + getMaxMinScoreProbability(board, "up", 3) + ")";
                     break;
                 case 83: //S
-                    var newBoard = generateMove(board, "down");
-                    for (var i = 0; i < 4; i++)
-                        board[i] = newBoard[i].slice();
-                    addRandomPiece();
-                    //debug = "D: (" + getMaxMinScore(board, "down", 3) + ", " + getMaxMinScoreProbability(board, "down", 3) + ")";
+                    debug = "D: (" + getMaxMinScore(board, "down", 3) + ", " + getMaxMinScoreProbability(board, "down", 3) + ")";
                     break;
                 case 65: //A
-                    var newBoard = generateMove(board, "left");
-                    for (var i = 0; i < 4; i++)
-                        board[i] = newBoard[i].slice();
-                    addRandomPiece();
-                    //debug = "L: (" + getMaxMinScore(board, "left", 3) + ", " + getMaxMinScoreProbability(board, "left", 3) + ")";
+                    debug = "L: (" + getMaxMinScore(board, "left", 3) + ", " + getMaxMinScoreProbability(board, "left", 3) + ")";
                     break;
                 case 68: //D    
-                    var newBoard = generateMove(board, "right");
-                    for (var i = 0; i < 4; i++)
-                        board[i] = newBoard[i].slice();
-                    addRandomPiece();
-                    //debug = "R: (" + getMaxMinScore(board, "right", 3) + ", " + getMaxMinScoreProbability(board, "right", 3) + ")";
+                    debug = "R: (" + getMaxMinScore(board, "right", 3) + ", " + getMaxMinScoreProbability(board, "right", 3) + ")";
                     break;
 
                 case 70: //F
                     controllingAddedTiles = 0;
-                    bestMove = getBestMove(board, 3);
+                    bestMove = getBestMove(board, 4);
                     move(bestMove);
                     break;
                 case 71: //G
@@ -844,7 +828,7 @@
             }
             if (direction == "right") {
                 for (var j = 0; j < 4; j++) {
-
+                    
                     for (var i = 2; i >= 0; i--) {
                         if (testBoard[i][j] != 0 && i < 3)
                             for (var k = i + 1; k <= 3; k++) {
@@ -857,7 +841,7 @@
                                     break;
                             }
                     }
-
+                    
                     for (var i = 3; i > 0; i--) {
                         if (testBoard[i][j] == testBoard[i - 1][j] && testBoard[i][j] != 0) {
                             testBoard[i][j] *= 2;
@@ -868,7 +852,7 @@
 
                         }
                     }
-
+                  
                 }
             }
             if (movable2 == 0)
@@ -883,8 +867,8 @@
             }
             else {
                 var testBoard = Array();
-                for (var k = 0; k < 4; k++)
-                    testBoard[k] = newTestBoard[k].slice();
+                for (var i2 = 0; i2 < 4; i2++)
+                    testBoard[i2] = newTestBoard[i2].slice();
 
                 testBoard[i][j] = number;
 
@@ -916,16 +900,17 @@
                     probabilityOfLosing = probabilities[3];
                     probabilityOfHavingLost = 1 - (1 - probabilityOfHavingLost) * (1 - probabilities[3]);
                 }
+                    //alert(probabilities[3]);
 
                 for (var i = 3; i >= 0; i--) {
 
-                    if (probabilities[i] == testBoardUpProbability)
+                    if (probabilities[i] == testBoardUpProbability && generateMove(board, "up") != "False")
                         return "up";
-                    if (probabilities[i] == testBoardLeftProbability)
+                    if (probabilities[i] == testBoardLeftProbability && generateMove(board, "left") != "False")
                         return "left";
-                    if (probabilities[i] == testBoardDownProbability)
+                    if (probabilities[i] == testBoardDownProbability && generateMove(board, "down") != "False")
                         return "down";
-                    if (probabilities[i] == testBoardRightProbability)
+                    if (probabilities[i] == testBoardRightProbability && generateMove(board, "right") != "False")
                         return "right";
                 }
             }
@@ -934,62 +919,71 @@
                 moves++;
                 for (var i = 0; i < 4; i++) {
 
-                    if (scores[i] == testBoardUpScore)
+                    if (scores[i] == testBoardUpScore && generateMove(board, "up") != "False")
                         return "up";
-                    if (scores[i] == testBoardLeftScore)
+                    if (scores[i] == testBoardLeftScore && generateMove(board, "left") != "False")
                         return "left";
-                    if (scores[i] == testBoardDownScore)
+                    if (scores[i] == testBoardDownScore && generateMove(board, "down") != "False")
                         return "down";
-                    if (scores[i] == testBoardRightScore)
+                    if (scores[i] == testBoardRightScore && generateMove(board, "right") != "False")
                         return "right";
                 }
             }
         }
         function getMaxMinScore(testBoard, direction, iterations) {
 
-            var newTestBoard = generateMove(testBoard, direction); //Make move
-
             if (iterations == 1) {
-                return score(newTestBoard);
+                return score(generateMove(testBoard, direction));
             }
             else {
+
+                var newTestBoard = generateMove(testBoard, direction); //Make move
 
                 if (newTestBoard == "False")
                     return -10;
 
-                var minNumber = 1000000;
-                var maxNumber;
+                var arrayOfNewTestBoards = Array();
 
                 for (var i = 0; i < 4; i++) //Add elements
                     for (var j = 0; j < 4; j++)
-                        if (newTestBoard[i][j] == 0) {
-                            maxNumber = Math.max(getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "up", iterations - 1),
-                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "down", iterations - 1),
-                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "left", iterations - 1),
-                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "right", iterations - 1));
+                        if (newTestBoard[i][j] == 0)
+                            arrayOfNewTestBoards.push(generateAddElement(newTestBoard, i, j, 2));
 
-                            if (maxNumber < minNumber)
-                                minNumber = maxNumber;
+                for (var i = 0; i < 4; i++)
+                    for (var j = 0; j < 4; j++)
+                        if (newTestBoard[i][j] == 0)
+                            arrayOfNewTestBoards.push(generateAddElement(newTestBoard, i, j, 4));
 
-                            maxNumber = Math.max(getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "up", iterations - 1),
-                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "down", iterations - 1),
-                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "left", iterations - 1),
-                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "right", iterations - 1));
+                var arrayOfNewTestBoardScores = Array();
 
-                            if (maxNumber < minNumber)
-                                minNumber = maxNumber;
+                for (var i = 0; i < arrayOfNewTestBoards.length; i++) {
 
-                        }
+                    var maxNumber = Math.max(getMaxMinScore(arrayOfNewTestBoards[i], "up", iterations - 1),
+                                            getMaxMinScore(arrayOfNewTestBoards[i], "down", iterations - 1),
+                                            getMaxMinScore(arrayOfNewTestBoards[i], "left", iterations - 1),
+                                            getMaxMinScore(arrayOfNewTestBoards[i], "right", iterations - 1));
+
+
+                    arrayOfNewTestBoardScores.push(maxNumber);
+                }
+
+                var minNumber = Math.min.apply(Math, arrayOfNewTestBoardScores);
+                /*var avgNumber = 0;
+    
+                for (var i in arrayOfNewTestBoardScores)
+                    if (isFinite(arrayOfNewTestBoardScores[i]))
+                        avgNumber += arrayOfNewTestBoardScores[i];
+    
+                avgNumber /= arrayOfNewTestBoardScores.length;*/
+
                 return minNumber;
             }
         }
         function getMaxMinScoreProbability(testBoard, direction, iterations) { //Returns probability of losing 
 
-            var newTestBoard = generateMove(testBoard, direction); //Make move
-
             if (iterations == 1) {
 
-                if (score(newTestBoard) < badBoardThreshold * score(board) - badBoardThresholdConstant)
+                if (score(generateMove(testBoard, direction)) < badBoardThreshold * score(board) - badBoardThresholdConstant)
                     return 1.0;
                 else
                     return 0.0;
@@ -997,18 +991,22 @@
             else {
                 var probability = 0;
 
+                var newTestBoard = generateMove(testBoard, direction); //Make move
+
                 if (newTestBoard == "False") //Unable to make move = bad  
                     return 1.0;
 
                 var arrayOfNewTestBoardsWith2s = Array();
-                var arrayOfNewTestBoardsWith4s = Array();
-
                 for (var i = 0; i < 4; i++) //Add elements
                     for (var j = 0; j < 4; j++)
-                        if (newTestBoard[i][j] == 0) {
+                        if (newTestBoard[i][j] == 0)
                             arrayOfNewTestBoardsWith2s.push(generateAddElement(newTestBoard, i, j, 2));
+
+                var arrayOfNewTestBoardsWith4s = Array();
+                for (var i = 0; i < 4; i++)
+                    for (var j = 0; j < 4; j++)
+                        if (newTestBoard[i][j] == 0)
                             arrayOfNewTestBoardsWith4s.push(generateAddElement(newTestBoard, i, j, 4));
-                        }
 
                 for (var i = 0; i < arrayOfNewTestBoardsWith2s.length; i++) {
 
@@ -1017,7 +1015,6 @@
                                     getMaxMinScoreProbability(arrayOfNewTestBoardsWith2s[i], "left", iterations - 1),
                                     getMaxMinScoreProbability(arrayOfNewTestBoardsWith2s[i], "right", iterations - 1));
                     p2 *= probabilityOf2 / arrayOfNewTestBoardsWith2s.length;
-
 
                     var p4 = Math.min(getMaxMinScoreProbability(arrayOfNewTestBoardsWith4s[i], "up", iterations - 1),
                                     getMaxMinScoreProbability(arrayOfNewTestBoardsWith4s[i], "down", iterations - 1),
