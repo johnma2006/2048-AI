@@ -84,26 +84,49 @@
                     updateBoard();
                     move("right");
                     break;
+                    
+                case 87: //W
+                    var newBoard = generateMove(board, "up");
+                    for (var i = 0; i < 4; i++)
+                        board[i] = newBoard[i].slice();
+                    addRandomPiece();
+                    //debug = "U: (" + getMaxMinScore(board, "up", 3) + ", " + getMaxMinScoreProbability(board, "up", 3) + ")";
+                    break;
+                case 83: //S
+                    var newBoard = generateMove(board, "down");
+                    for (var i = 0; i < 4; i++)
+                        board[i] = newBoard[i].slice();
+                    addRandomPiece();
+                    //debug = "D: (" + getMaxMinScore(board, "down", 3) + ", " + getMaxMinScoreProbability(board, "down", 3) + ")";
+                    break;
+                case 65: //A
+                    var newBoard = generateMove(board, "left");
+                    for (var i = 0; i < 4; i++)
+                        board[i] = newBoard[i].slice();
+                    addRandomPiece();
+                    //debug = "L: (" + getMaxMinScore(board, "left", 3) + ", " + getMaxMinScoreProbability(board, "left", 3) + ")";
+                    break;
+                case 68: //D    
+                    var newBoard = generateMove(board, "right");
+                    for (var i = 0; i < 4; i++)
+                        board[i] = newBoard[i].slice();
+                    addRandomPiece();
+                    //debug = "R: (" + getMaxMinScore(board, "right", 3) + ", " + getMaxMinScoreProbability(board, "right", 3) + ")";
+                    break;
 
-                //case 70: //F
-                  //  controllingAddedTiles = 0;
-                   // bestMove = getBestMove(board, 3);
-                   // move(bestMove);
+                case 70: //F
+                    controllingAddedTiles = 0;
+                    bestMove = getBestMove(board, 3);
+                    move(bestMove);
                     break;
                 case 71: //G
                     controllingAddedTiles = 0;
                     activeAI = 1;
+
                     break;
                 case 72: //H
                     controllingAddedTiles = 0;
                     activeAI = 0;
-                    break;
-
-                case 82: //R
-                    controllingAddedTiles = 0;
-                    activeAI = 0;
-                    movable = 0;
-                    initializeBoard();
                     break;
 
                 case 49: //1
@@ -112,9 +135,9 @@
                 case 50: //2
                     colour = "Pink";
                     break;
-                //case 51: //3
-                 //   colour = "Pink";
-                  //  break;
+                case 51: //3
+                    colour = "Pink";
+                    break;
 
                 
             }
@@ -251,10 +274,9 @@
             ctx.fillText("(Try to make the computer lose)", 610, 220);
             ctx.font = "bold 20px Calibri";
             ctx.fillText("1/2 to change theme", 610, 250);
-            ctx.fillText("R to restart game", 610, 280);
 
             ctx.font = "14px Calibri"; 
-            /*
+
             ctx.fillText("moves: " + moves, 610, 470);
             ctx.fillText("(pMoves, deepMoves): (" + pMoves + ", " + deepMoves + ")", 610, 490);
             ctx.fillText("score(board): " + score(board), 610, 510);
@@ -262,7 +284,7 @@
             ctx.fillText("secondColOff: " + secondColOff, 610, 550);
 
             ctx.fillText(debug, 610, 570);
-            ctx.fillText(debug2, 610, 590);*/
+            ctx.fillText(debug2, 610, 590);
 
         }
         function drawPieces() {
@@ -871,10 +893,10 @@
         }
         function getBestMove(testBoard, iterations) {
 
-            var testBoardUpScore = getMaxMinScore(testBoard, "up", iterations, 0);
-            var testBoardDownScore = getMaxMinScore(testBoard, "down", iterations, 0);
-            var testBoardLeftScore = getMaxMinScore(testBoard, "left", iterations, 0);
-            var testBoardRightScore = getMaxMinScore(testBoard, "right", iterations, 0);
+            var testBoardUpScore = getMaxMinScore(testBoard, "up", iterations);
+            var testBoardDownScore = getMaxMinScore(testBoard, "down", iterations);
+            var testBoardLeftScore = getMaxMinScore(testBoard, "left", iterations);
+            var testBoardRightScore = getMaxMinScore(testBoard, "right", iterations);
 
             var scores = [testBoardUpScore, testBoardDownScore, testBoardLeftScore, testBoardRightScore];
             scores.sort(function (a, b) { return b - a }); //biggest first
@@ -923,7 +945,7 @@
                 }
             }
         }
-        function getMaxMinScore(testBoard, direction, iterations, score_achieved) {
+        function getMaxMinScore(testBoard, direction, iterations) {
 
             var newTestBoard = generateMove(testBoard, direction); //Make move
 
@@ -941,49 +963,21 @@
                 for (var i = 0; i < 4; i++) //Add elements
                     for (var j = 0; j < 4; j++)
                         if (newTestBoard[i][j] == 0) {
-                            //maxNumber = Math.max(getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "up", iterations - 1),
-                              //                      getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "down", iterations - 1),
-                                //                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "left", iterations - 1),
-                            //                  getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "right", iterations - 1));
-
-                            up_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "up", iterations - 1, 0);
-                            maxNumber = up_score;
-                            down_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "down", iterations - 1, maxNumber);
-                            if (down_score > maxNumber)
-                                maxNumber = down_score;
-                            left_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "left", iterations - 1, maxNumber);
-                            if (left_score > maxNumber)
-                                maxNumber = left_score;
-                            right_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "right", iterations - 1, maxNumber);
-                            if (left_score > maxNumber)
-                                maxNumber = left_score;
+                            maxNumber = Math.max(getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "up", iterations - 1),
+                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "down", iterations - 1),
+                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "left", iterations - 1),
+                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 2), "right", iterations - 1));
 
                             if (maxNumber < minNumber)
                                 minNumber = maxNumber;
-                            if (maxNumber < score_achieved)
-                                return maxNumber;
 
-                            //maxNumber = Math.max(getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "up", iterations - 1),
-                             //                       getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "down", iterations - 1),
-                             //                       getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "left", iterations - 1),
-                               //                     getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "right", iterations - 1));
-
-                            up_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "up", iterations - 1, 0);
-                            maxNumber = up_score;
-                            down_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "down", iterations - 1, maxNumber);
-                            if (down_score > maxNumber)
-                                maxNumber = down_score;
-                            left_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "left", iterations - 1, maxNumber);
-                            if (left_score > maxNumber)
-                                maxNumber = left_score;
-                            right_score = getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "right", iterations - 1, maxNumber);
-                            if (left_score > maxNumber)
-                                maxNumber = left_score;
+                            maxNumber = Math.max(getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "up", iterations - 1),
+                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "down", iterations - 1),
+                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "left", iterations - 1),
+                                                    getMaxMinScore(generateAddElement(newTestBoard, i, j, 4), "right", iterations - 1));
 
                             if (maxNumber < minNumber)
                                 minNumber = maxNumber;
-                            if (maxNumber < score_achieved)
-                                return maxNumber;
 
                         }
                 return minNumber;
